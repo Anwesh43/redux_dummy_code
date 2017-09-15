@@ -2,7 +2,8 @@ class Store {
 	constructor(reducer) {
 		this.cbs = []
 		this.reducer = reducer
-		this.state = this.reducer({}) 	
+		console.log(this.reducer)
+		this.state = this.reducer({},{type:null}) 	
 	}
 	subscribe(cb) {
 		this.cbs.push(cb)
@@ -11,17 +12,26 @@ class Store {
 		return this.state
 	}
 	dispatch(action) {
-		this.state = this.reducer(action)
+		this.state = this.reducer(this.state,action)
 		this.cbs.forEach((cb)=>cb())
 	}
 }
 const createStore = (reducer)=>{
-	this.store = new Store(reducer)
+	return  new Store(reducer)
 }
 const combineReducer = (reducerObj) => {
-	return (action)=>{
-		var newState = {}
-		Object.values(reducerObj).forEach((cb)=>{newState = Object.assign({},newState,cb(action))})
+	return (state,action)=>{
+		console.log(action)
+		var newState = Object.assign({},state)
+		Object.keys(reducerObj).forEach((key)=>{
+			console.log(key)
+			const cb = reducerObj[key]
+			const updatedState = {}
+			updatedState[key] = cb(newState[key],action)
+			console.log(updatedState)
+			
+			newState = Object.assign({},newState,updatedState)
+		})
 		return newState
 	}
 }
